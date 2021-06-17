@@ -1,0 +1,304 @@
+{
+  openapi 3.0.1,
+  info {
+    title Zeva.AuthenticationService.PathValidation.Host,
+    version 1.0
+  },
+  paths {
+    buildGetFirstValidPath {
+      post {
+        tags [
+          PathValidation
+        ],
+        summary This method attempts to build a chain from end entity up to a trusted root certificate.rnEach chain discovered will be validated according to the provided validation arguments. The first chain to be validrnwill be returned in the response.,
+        requestBody {
+          content {
+            applicationjson-patch+json {
+              schema {
+                $ref #componentsschemasCertificatePathBuildingRequest
+              }
+            },
+            applicationjson {
+              schema {
+                $ref #componentsschemasCertificatePathBuildingRequest
+              }
+            },
+            textjson {
+              schema {
+                $ref #componentsschemasCertificatePathBuildingRequest
+              }
+            },
+            application+json {
+              schema {
+                $ref #componentsschemasCertificatePathBuildingRequest
+              }
+            }
+          }
+        },
+        responses {
+          200 {
+            description Success,
+            content {
+              applicationjson {
+                schema {
+                  $ref #componentsschemasCertificatePathResponse
+                }
+              }
+            }
+          },
+          400 {
+            description Bad Request,
+            content {
+              applicationjson {
+                schema {
+                  $ref #componentsschemasValidationError
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    validate {
+      post {
+        tags [
+          PathValidation
+        ],
+        summary This method attempts to validate a certificate chain provided in the request.rnA path starts with the Subject certificate and proceeds through a number of intermediaterncertificates up to a trusted root certificate. If Validation arguments are provided in the request body,rnthe certificate chain will be validated according to the specified arguments.,
+        requestBody {
+          content {
+            applicationjson-patch+json {
+              schema {
+                $ref #componentsschemasCertificatePathValidationRequest
+              }
+            },
+            applicationjson {
+              schema {
+                $ref #componentsschemasCertificatePathValidationRequest
+              }
+            },
+            textjson {
+              schema {
+                $ref #componentsschemasCertificatePathValidationRequest
+              }
+            },
+            application+json {
+              schema {
+                $ref #componentsschemasCertificatePathValidationRequest
+              }
+            }
+          }
+        },
+        responses {
+          200 {
+            description Success,
+            content {
+              applicationjson {
+                schema {
+                  $ref #componentsschemasCertificatePathValidationResponse
+                }
+              }
+            }
+          },
+          400 {
+            description Bad Request,
+            content {
+              applicationjson {
+                schema {
+                  $ref #componentsschemasValidationError
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  components {
+    schemas {
+      CertificatePathBuildingRequest {
+        required [
+          endEntityCertificate,
+          trustAnchors
+        ],
+        type object,
+        properties {
+          endEntityCertificate {
+            type string
+          },
+          trustAnchors {
+            type array,
+            items {
+              type string
+            }
+          },
+          pathValidationArguments {
+            $ref #componentsschemasPathValidationArguments
+          }
+        },
+        additionalProperties false
+      },
+      CertificatePathResponse {
+        type object,
+        properties {
+          trustAnchor {
+            type string,
+            nullable true
+          },
+          certificates {
+            type array,
+            items {
+              type string
+            },
+            nullable true
+          }
+        },
+        additionalProperties false
+      },
+      CertificatePathValidationRequest {
+        required [
+          certificatePath,
+          trustAnchor
+        ],
+        type object,
+        properties {
+          certificatePath {
+            type array,
+            items {
+              type string
+            }
+          },
+          trustAnchor {
+            type string
+          },
+          pathValidationArguments {
+            $ref #componentsschemasPathValidationArguments
+          }
+        },
+        additionalProperties false
+      },
+      CertificatePathValidationResponse {
+        type object,
+        properties {
+          certificateStatus {
+            type array,
+            items {
+              $ref #componentsschemasCertificateStatus
+            },
+            nullable true
+          },
+          policyPaths {
+            type array,
+            items {
+              $ref #componentsschemasCertificatePolicyPath
+            },
+            nullable true
+          }
+        },
+        additionalProperties false
+      },
+      CertificatePolicyPath {
+        type object,
+        properties {
+          policies {
+            type array,
+            items {
+              type string
+            },
+            nullable true
+          },
+          isValidForRequireExplicitPolicy {
+            type boolean
+          }
+        },
+        additionalProperties false
+      },
+      CertificateStatus {
+        type object,
+        properties {
+          certificate {
+            type string,
+            nullable true
+          },
+          isSignatureValid {
+            type boolean
+          },
+          issuerNameMatch {
+            type boolean
+          },
+          notYetValid {
+            type boolean
+          },
+          expired {
+            type boolean
+          },
+          isValidKeyUsage {
+            type boolean
+          },
+          hasValidName {
+            type boolean
+          },
+          withinAllowedPathLength {
+            type boolean,
+            nullable true
+          },
+          isCA {
+            type boolean,
+            nullable true
+          },
+          unrecognizedCriticalExtensions {
+            type array,
+            items {
+              type string
+            },
+            nullable true
+          }
+        },
+        additionalProperties false
+      },
+      PathValidationArguments {
+        type object,
+        properties {
+          initialPolicySet {
+            type array,
+            items {
+              type string
+            },
+            nullable true
+          },
+          initialExplicitPolicy {
+            type boolean
+          },
+          initialInhibitAnyPolicy {
+            type boolean
+          },
+          initialPolicyMappingInhibit {
+            type boolean
+          },
+          currentTime {
+            type string,
+            format date-time
+          },
+          useDeltaCrls {
+            type boolean
+          }
+        },
+        additionalProperties false
+      },
+      ValidationError {
+        type object,
+        properties {
+          property {
+            type string,
+            nullable true
+          },
+          description {
+            type string,
+            nullable true
+          }
+        },
+        additionalProperties false
+      }
+    }
+  }
+}
